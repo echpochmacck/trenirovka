@@ -20,11 +20,14 @@ class Razmechenie extends \yii\db\ActiveRecord
 {
 
     
+    
     public $kind_title;
     public $room_title;
     public $room_quantity;
     public $is_water;
-
+    public $k1_title;
+    public $k2_title;
+    
     /**
      * {@inheritdoc}
      */
@@ -43,6 +46,8 @@ class Razmechenie extends \yii\db\ActiveRecord
             [['quantity', 'kind_id', 'room_id'], 'integer'],
             [['kind_id'], 'exist', 'skipOnError' => true, 'targetClass' => Kind::class, 'targetAttribute' => ['kind_id' => 'id']],
             [['room_id'], 'exist', 'skipOnError' => true, 'targetClass' => Room::class, 'targetAttribute' => ['room_id' => 'id']],
+            
+            
         ];
     }
 
@@ -56,6 +61,7 @@ class Razmechenie extends \yii\db\ActiveRecord
             'quantity' => 'Количество животных',
             'kind_id' => 'Kind ID',
             'room_id' => 'Room ID',
+            
         ];
     }
 

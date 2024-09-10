@@ -20,16 +20,22 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <?= GridView::widget([
         'dataProvider' => $dataProvider,
+        'filterModel' => $searchModel,
         'columns' => [
             ['class' => 'yii\grid\SerialColumn'],
 
             [
-                'label' => 'Пары',
-                'value' => 'title',
+                'attribute' => 'k1_title',
+                'label' => 'Вид 1',
+            ],
+
+            [
+                'attribute' => 'k2_title',
+                'label' => 'Вид 2',
             ],
             [
 
-                'value' => 'room_title',
+                'attribute' => 'room_title',
                 'label' => 'Название помещения ',
             ]
         ]

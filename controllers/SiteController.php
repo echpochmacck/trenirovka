@@ -9,6 +9,7 @@ use yii\web\Response;
 use yii\filters\VerbFilter;
 use app\models\LoginForm;
 use app\models\ContactForm;
+use app\models\PairsSearch;
 use app\models\Razmechenie;
 use app\models\RazmechenieSearch;
 use yii\data\ActiveDataProvider;
@@ -74,7 +75,7 @@ class SiteController extends Controller
      */
     public function actionLogin()
     {
-        
+
         if (Yii::$app->request->isPost) {
             if (Yii::$app->session->has('check')) {
                 if (Yii::$app->session->get('check') < 3) {
@@ -121,18 +122,7 @@ class SiteController extends Controller
      *
      * @return Response|string
      */
-    public function actionContact()
-    {
-        $model = new ContactForm();
-        if ($model->load(Yii::$app->request->post()) && $model->contact(Yii::$app->params['adminEmail'])) {
-            Yii::$app->session->setFlash('contactFormSubmitted');
 
-            return $this->refresh();
-        }
-        return $this->render('contact', [
-            'model' => $model,
-        ]);
-    }
 
     /**
      * Displays about page.
@@ -200,7 +190,7 @@ class SiteController extends Controller
     {
         if (!Yii::$app->user->isGuest) {
             $searchModel = new RazmechenieSearch();
-            
+
             $dataProvider = $searchModel->search($this->request->queryParams);
             return $this->render('check-karlik', [
                 'searchModel' => $searchModel,
@@ -216,25 +206,22 @@ class SiteController extends Controller
         if (!Yii::$app->user->isGuest) {
             $data = Razmechenie::queryKarlik()
                 ->all();
-                $str = "Вид;Количество животных;наличие воды;Комплекс\r\n";
-            if(!empty($data)) {
+            $str = "Вид;Количество животных;наличие воды;Комплекс\r\n";
+            if (!empty($data)) {
                 foreach ($data as $raw) {
                     $str .= $raw['kind_title'] . ';'
                         . $raw['room_quantity'] . ';'
                         . $raw['is_water'] . ';'
                         . $raw['room_title'] . "\r\n";
                 }
-                
             } else {
-               $str  .='Ничего не найдено' . "\r\n";
+                $str  .= 'Ничего не найдено' . "\r\n";
             }
             $str = iconv('utf-8', 'windows-1251', $str);
             Yii::$app->response->sendContentAsFile($str, 'Карлики.csv')->send();
         } else {
             return $this->goHome();
         }
-
-        
     }
 
     public function actionDog()
@@ -256,32 +243,29 @@ class SiteController extends Controller
         if (!Yii::$app->user->isGuest) {
             $data = Razmechenie::queryDog()
                 ->all();
-                $str = "Семейство;Количество животных;\r\n";
-            if(!empty($data)) {
+            $str = "Семейство;Количество животных;\r\n";
+            if (!empty($data)) {
                 foreach ($data as $raw) {
                     $str .= $raw['kind_title'] . ';'
                         . $raw['quantity'] . "\r\n";
                 }
-                
             } else {
-               $str  .='Ничего не найдено' . "\r\n";
+                $str  .= 'Ничего не найдено' . "\r\n";
             }
             $str = iconv('utf-8', 'windows-1251', $str);
             Yii::$app->response->sendContentAsFile($str, 'Псовые.csv')->send();
         } else {
             return $this->goHome();
         }
-
-        
     }
 
     public function actionPairs()
     {
         if (!Yii::$app->user->isGuest) {
-            $dataProvider = new ActiveDataProvider([
-                'query' => Razmechenie::queryPairs()
-            ]);
+            $searchModel = new PairsSearch();
+            $dataProvider = $searchModel->search($this->request->queryParams);
             return $this->render('check-pairs', [
+                'searchModel' => $searchModel,
                 'dataProvider' => $dataProvider
             ]);
         } else {
@@ -292,23 +276,24 @@ class SiteController extends Controller
     public function actionExportPairs()
     {
         if (!Yii::$app->user->isGuest) {
-            $data = Razmechenie::queryDog()
+            $searchModel = new PairsSearch();
+            $dataProvider = $searchModel->search($this->request->queryParams);
+            $data = $dataProvider->query
                 ->all();
-                $str = "Пары;Комплекс;\r\n";
-            if(!empty($data)) {
+            $str = "Пары;Комплекс;\r\n";
+            if (!empty($data)) {
                 foreach ($data as $raw) {
-                    $str .= $raw['kind_title'] . ';'
+                    $str .= $raw['k1_title'] . ';'
+                        . $raw['k2_title'] . ';'
                         . $raw['quantity'] . "\r\n";
                 }
-                
             } else {
-               $str  .='Ничего не найдено' . "\r\n";
+                $str  .= 'Ничего не найдено' . "\r\n";
             }
             $str = iconv('utf-8', 'windows-1251', $str);
             Yii::$app->response->sendContentAsFile($str, 'Пары.csv')->send();
         } else {
             return $this->goHome();
         }
-
     }
 }
